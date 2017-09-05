@@ -3,7 +3,7 @@ import React from 'react';
 import { getVisibleSelectionRect } from 'draft-js';
 
 // TODO make toolbarHeight to be determined or a parameter
-const toolbarHeight = 44;
+const toolbarHeight = 30;
 
 const getRelativeParent = (element) => {
   if (!element) {
@@ -48,7 +48,7 @@ export default class Toolbar extends React.Component {
    */
   onOverrideContent = (overrideContent) => {
     this.setState({ overrideContent });
-  }
+  };
 
   onSelectionChanged = () => {
     // need to wait a tick for window.getSelection() to be accurate
@@ -65,6 +65,36 @@ export default class Toolbar extends React.Component {
         top: (selectionRect.top - relativeRect.top) - toolbarHeight,
         left: (selectionRect.left - relativeRect.left) + (selectionRect.width / 2),
       };
+
+      // Align pointer on the toolbar of selected text
+      const left = position.left - ((this.toolbar.offsetWidth + 10) / 2);
+      const right = (window.innerWidth - position.left) - ((this.toolbar.offsetWidth + 10) / 2);
+
+      // Steps below to modify pseudo element styles:
+      // 1. Create a new style tag
+      const style = document.createElement('style');
+      // 2. Append the style tag to head
+      document.head.appendChild(style);
+      // 3. Grab the stylesheet object
+      const sheet = style.sheet;
+
+      // Align pointer and toolbar
+      if (left < 0) {
+        position.left += Math.abs(left);
+        // 4. Use addRule inject pseudo styles
+        sheet.addRule(`.${this.props.theme.toolbarStyles.toolbar}::before`, `left: ${(left + position.left - 5)}px`);
+        sheet.addRule(`.${this.props.theme.toolbarStyles.toolbar}::after`, `left: ${(left + position.left - 5)}px`);
+      } else if (right < 0) {
+        position.left -= Math.abs(right);
+        // 4. Use addRule inject pseudo styles
+        sheet.addRule(`.${this.props.theme.toolbarStyles.toolbar}::before`, `left: ${(Math.abs(right) + (this.toolbar.offsetWidth/2))}px`);
+        sheet.addRule(`.${this.props.theme.toolbarStyles.toolbar}::after`, `left: ${(Math.abs(right) + (this.toolbar.offsetWidth/2))}px`);
+      } else {
+        // 4. Use addRule inject pseudo styles
+        sheet.addRule(`.${this.props.theme.toolbarStyles.toolbar}::before`, `left: ${(this.toolbar.offsetWidth/2)}px`);
+        sheet.addRule(`.${this.props.theme.toolbarStyles.toolbar}::after`, `left: ${(this.toolbar.offsetWidth/2)}px`);
+      }
+
       this.setState({ position });
     });
   };

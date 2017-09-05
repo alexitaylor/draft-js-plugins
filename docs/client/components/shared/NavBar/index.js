@@ -96,6 +96,13 @@ export default class NavBar extends Component {
               </Link>
             </li>
           </ul>
+          <ul className={styles.plugins}>
+            <li className={styles.plugin}>
+              <Link to="/plugin/my-inline-toolbar" className={styles.link}>
+                My Inline Toolbar
+              </Link>
+            </li>
+          </ul>
         </div>
         <div style={{ textAlign: 'center', marginTop: '3rem', fontSize: 13, color: '#aaa' }}>
           The documentation currently represents the 2.0.0-rc5 release.<br />For troubleshooting please checkout the
